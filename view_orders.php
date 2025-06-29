@@ -10,21 +10,6 @@ require_once 'db_connect.php';
 
 $user_email = $_SESSION['user_email'];
 
-$jersey_names = array(
-    1 => "Kawhi Leonard",
-    2 => "Jalen Brunson", 
-    3 => "Jimmy Butler",
-    4 => "KAT WOLVES SERIES",
-    5 => "Lamelo Ball",
-    6 => "Victor Wembanyama",
-    7 => "Kyrie Irving",
-    8 => "D Angelo Russell",
-    9 => "Kemba Walker",
-    10 => "Lauri Markannen",
-    11 => "Kevin Love",
-    12 => "Dirk Nowitzki"
-);
-
 if (isset($_GET['delete_id'])) {
     $delete_id = $_GET['delete_id'];
     
@@ -57,13 +42,44 @@ $result = $stmt->get_result();
 $total_cost = 0;
 $orders = [];
 while ($row = $result->fetch_assoc()) {
-    $row['jersey_name'] = isset($jersey_names[$row['item']]) ? $jersey_names[$row['item']] : 'Jersey #' . $row['item'];
     $orders[] = $row;
     $total_cost += $row['cost'];
 }
 
 $stmt->close();
 $conn->close();
+
+function getJerseyImage($jersey_name) {
+    $jersey_images = array(
+        "Kawhi Leonard" => "images/kawhileonard.jpg",
+        "Jalen Brunson" => "images/brunson.jpg",
+        "Jimmy Butler" => "images/jimmybutler.jpg",
+        "KAT WOLVES SERIES" => "images/Wolves.jpg",
+        "Lamelo Ball" => "images/Ball.jpeg",
+        "Victor Wembanyama" => "images/wembanyama.jpeg",
+        "Kyrie Irving" => "images/irving.jpg",
+        "D Angelo Russell" => "images/russell.jpg",
+        "Kemba Walker" => "images/Kemba.jpg",
+        "Lauri Markannen" => "images/Markannen.jpg",
+        "Kevin Love" => "images/Love.jpg",
+        "Dirk Nowitzki" => "images/Nowitski.jpg",
+        "Nikola Jokic" => "images/Jokic.jpg",
+        "Stephen Curry" => "images/Curry.jpg",
+        "James Harden" => "images/Harden.jpg",
+        "Victor Oladipo" => "images/Oladipo.jpg",
+        "Lebron James" => "images/Lebron.jpg",
+        "Mike Conley" => "images/Conley.jpg",
+        "Dwayne Wade" => "images/Wade.jpg",
+        "Giannis Antetokounmpo" => "images/Giannis.jpg",
+        "Russell Westbrook" => "images/Westbrook.jpg",
+        "Devin Booker" => "images/Suns.jpg",
+        "De'Aaron Fox" => "images/Fox.jpg",
+        "Jordan Clarkson" => "images/Utah.jpg",
+        "Manu Ginobili" => "images/Spurs.jpg"
+    );
+    
+    return isset($jersey_images[$jersey_name]) ? $jersey_images[$jersey_name] : "images/default.jpg";
+}
 ?>
 
 <!DOCTYPE html>
@@ -213,6 +229,19 @@ $conn->close();
             text-align: center;
             font-weight: bold;
         }
+        
+        .jersey-image {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+        
+        .jersey-info {
+            display: flex;
+            align-items: center;
+        }
     </style>
 </head>
 <body>
@@ -232,7 +261,7 @@ $conn->close();
                             <a class="nav-link active" href="view_orders.php">My Orders</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="search_orders.php">Search Orders</a>
+                            <a class="nav-link" href="search_orders.php">Search Items</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="logout.php">Logout</a>
@@ -251,7 +280,7 @@ $conn->close();
         
         <div class="action-buttons text-center">
             <a href="ordering.php" class="btn btn-primary me-2">Add More Items</a>
-            <a href="search_orders.php" class="btn btn-outline-secondary">Search Orders</a>
+            <a href="search_orders.php" class="btn btn-outline-secondary">Search Items</a>
         </div>
         
         <?php if (isset($success_message)): ?>
@@ -277,7 +306,7 @@ $conn->close();
                         <thead>
                             <tr>
                                 <th>Order #</th>
-                                <th>Jersey Name</th>
+                                <th>Jersey</th>
                                 <th>Price</th>
                                 <th>Order Date</th>
                                 <th>Action</th>
@@ -288,7 +317,10 @@ $conn->close();
                                 <tr>
                                     <td>#<?php echo str_pad($index + 1, 4, '0', STR_PAD_LEFT); ?></td>
                                     <td>
-                                        <strong><?php echo htmlspecialchars($order['jersey_name'] ? $order['jersey_name'] : 'Jersey #' . $order['item']); ?></strong>
+                                        <div class="jersey-info">
+                                            <img src="<?php echo getJerseyImage($order['item']); ?>" alt="<?php echo htmlspecialchars($order['item']); ?>" class="jersey-image">
+                                            <strong><?php echo htmlspecialchars($order['item']); ?></strong>
+                                        </div>
                                     </td>
                                     <td>
                                         <span class="text-danger fw-bold">₱<?php echo number_format($order['cost'], 2); ?></span>

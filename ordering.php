@@ -17,7 +17,7 @@ if (isset($_GET['item']) && isset($_GET['cost'])) {
     $order_date = date('Y-m-d'); 
     
     $stmt = $conn->prepare("INSERT INTO orders (order_date, email, item, cost, quantity, amount) VALUES (?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("ssiiid", $order_date, $user_email, $cost, $cost, $quantity, $amount);
+    $stmt->bind_param("sssiid", $order_date, $user_email, $item_name, $cost, $quantity, $amount);
     
     if ($stmt->execute()) {
         $success_message = "Item added to your orders successfully!";
@@ -208,7 +208,7 @@ $conn->close();
                             <a class="nav-link" href="view_orders.php">My Orders</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="search_orders.php">Search Orders</a>
+                            <a class="nav-link" href="search_orders.php">Search Items</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="logout.php">Logout</a>
@@ -277,7 +277,7 @@ $conn->close();
                         </div>
                         <div class="jersey-name">KAT WOLVES SERIES</div>
                         <div class="jersey-price">₱400</div>
-                        <a href="ordering.php?item=Karl Anthony Towns Wolves Series&cost=400" class="add-to-cart">Add to Cart</a>
+                        <a href="ordering.php?item=KAT WOLVES SERIES&cost=400" class="add-to-cart">Add to Cart</a>
                     </div>
                 </div>
                 

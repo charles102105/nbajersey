@@ -6,30 +6,51 @@ if (!isset($_SESSION['user_email'])) {
     exit();
 }
 
-require_once 'db_connect.php';
-
-$user_email = $_SESSION['user_email'];
 $search_query = '';
-$orders = [];
-$total_cost = 0;
+$products = [];
+$search_performed = false;
 
-if (isset($_POST['search']) && !empty($_POST['search_term'])) {
-    $search_query = $_POST['search_term'];
-    
-    $stmt = $conn->prepare("SELECT item, cost, order_date FROM orders WHERE email = ? AND item LIKE ? ORDER BY order_date DESC");
-    $search_term = "%" . $search_query . "%";
-    $stmt->bind_param("ss", $user_email, $search_term);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    
-    while ($row = $result->fetch_assoc()) {
-        $orders[] = $row;
-        $total_cost += $row['cost'];
-    }
-    $stmt->close();
+function getAllProducts() {
+    return array(
+        array('name' => 'Kawhi Leonard', 'price' => 100, 'image' => 'images/kawhileonard.jpg'),
+        array('name' => 'Jalen Brunson', 'price' => 200, 'image' => 'images/brunson.jpg'),
+        array('name' => 'Jimmy Butler', 'price' => 300, 'image' => 'images/jimmybutler.jpg'),
+        array('name' => 'KAT WOLVES SERIES', 'price' => 400, 'image' => 'images/Wolves.jpg'),
+        array('name' => 'Lamelo Ball', 'price' => 500, 'image' => 'images/Ball.jpeg'),
+        array('name' => 'Victor Wembanyama', 'price' => 600, 'image' => 'images/wembanyama.jpeg'),
+        array('name' => 'Kyrie Irving', 'price' => 700, 'image' => 'images/irving.jpg'),
+        array('name' => 'D Angelo Russell', 'price' => 800, 'image' => 'images/russell.jpg'),
+        array('name' => 'Kemba Walker', 'price' => 900, 'image' => 'images/Kemba.jpg'),
+        array('name' => 'Lauri Markannen', 'price' => 1000, 'image' => 'images/Markannen.jpg'),
+        array('name' => 'Kevin Love', 'price' => 1100, 'image' => 'images/Love.jpg'),
+        array('name' => 'Dirk Nowitzki', 'price' => 1200, 'image' => 'images/Nowitski.jpg'),
+        array('name' => 'Nikola Jokic', 'price' => 1300, 'image' => 'images/Jokic.jpg'),
+        array('name' => 'Stephen Curry', 'price' => 1400, 'image' => 'images/Curry.jpg'),
+        array('name' => 'James Harden', 'price' => 1500, 'image' => 'images/Harden.jpg'),
+        array('name' => 'Victor Oladipo', 'price' => 1600, 'image' => 'images/Oladipo.jpg'),
+        array('name' => 'Lebron James', 'price' => 1700, 'image' => 'images/Lebron.jpg'),
+        array('name' => 'Mike Conley', 'price' => 1800, 'image' => 'images/Conley.jpg'),
+        array('name' => 'Dwayne Wade', 'price' => 1900, 'image' => 'images/Wade.jpg'),
+        array('name' => 'Giannis Antetokounmpo', 'price' => 2000, 'image' => 'images/Giannis.jpg'),
+        array('name' => 'Russell Westbrook', 'price' => 2100, 'image' => 'images/Westbrook.jpg'),
+        array('name' => 'Devin Booker', 'price' => 2200, 'image' => 'images/Suns.jpg'),
+        array('name' => 'De\'Aaron Fox', 'price' => 2300, 'image' => 'images/Fox.jpg'),
+        array('name' => 'Jordan Clarkson', 'price' => 2400, 'image' => 'images/Utah.jpg'),
+        array('name' => 'Manu Ginobili', 'price' => 2500, 'image' => 'images/Spurs.jpg')
+    );
 }
 
-$conn->close();
+if (isset($_POST['search']) && !empty($_POST['search_term'])) {
+    $search_query = trim($_POST['search_term']);
+    $search_performed = true;
+    $all_products = getAllProducts();
+    
+    foreach ($all_products as $product) {
+        if (stripos($product['name'], $search_query) !== false) {
+            $products[] = $product;
+        }
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -37,7 +58,7 @@ $conn->close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Search Orders - NBA Jersey Store</title>
+    <title>Search Products - NBA Jersey Store</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
@@ -125,30 +146,6 @@ $conn->close();
             color: #333;
         }
         
-        .table-responsive {
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        
-        .table th {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 15px;
-            font-weight: 600;
-        }
-        
-        .table td {
-            padding: 15px;
-            vertical-align: middle;
-            border-bottom: 1px solid #dee2e6;
-        }
-        
-        .table tbody tr:hover {
-            background-color: #f8f9fa;
-        }
-        
         .user-info {
             background: white;
             padding: 15px 20px;
@@ -172,15 +169,6 @@ $conn->close();
             font-weight: bold;
         }
         
-        .total-section {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 8px;
-            margin-top: 20px;
-            text-align: center;
-        }
-        
         .clear-search {
             background-color: #6c757d;
             border: none;
@@ -194,6 +182,86 @@ $conn->close();
         .clear-search:hover {
             background-color: #5a6268;
             color: white;
+        }
+        
+        .jersey-item {
+            text-align: center;
+            padding: 20px;
+            border: 1px solid #dee2e6;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            background: white;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .jersey-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+        
+        .jersey-image-container {
+            width: 100%;
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            background-color: #f8f9fa;
+        }
+        
+        .jersey-image {
+            max-width: 100%;
+            max-height: 100%;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            border-radius: 5px;
+        }
+        
+        .jersey-name {
+            font-size: 16px;
+            font-weight: bold;
+            margin: 10px 0;
+            color: #333;
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .jersey-price {
+            font-size: 18px;
+            color: #dc3545;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .add-to-cart {
+            background-color: #007bff;
+            color: white;
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 4px;
+            display: inline-block;
+            font-size: 14px;
+            margin-top: auto;
+            transition: background-color 0.3s ease;
+        }
+        
+        .add-to-cart:hover {
+            background-color: #0056b3;
+            color: white;
+            text-decoration: none;
+        }
+        
+        .browse-all {
+            text-align: center;
+            margin-top: 20px;
         }
     </style>
 </head>
@@ -214,7 +282,7 @@ $conn->close();
                             <a class="nav-link" href="view_orders.php">My Orders</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link active" href="search_orders.php">Search Orders</a>
+                            <a class="nav-link active" href="search_orders.php">Search Items</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="logout.php">Logout</a>
@@ -227,18 +295,18 @@ $conn->close();
         <div class="user-info">
             <strong>Welcome, <?php echo htmlspecialchars($_SESSION['user_email']); ?>!</strong>
             <span class="float-end">
-                <a href="view_orders.php" class="btn btn-sm btn-outline-primary">View All Orders</a>
-                <a href="ordering.php" class="btn btn-sm btn-primary">Continue Shopping</a>
+                <a href="view_orders.php" class="btn btn-sm btn-outline-primary">View My Orders</a>
+                <a href="ordering.php" class="btn btn-sm btn-primary">Browse All Jerseys</a>
             </span>
         </div>
         
         <div class="search-container">
-            <h2 class="search-title">Search Your Orders</h2>
+            <h2 class="search-title">Search NBA Jerseys</h2>
             
             <form method="POST" class="search-form">
                 <div class="input-group">
                     <input type="text" name="search_term" class="form-control search-input" 
-                           placeholder="Search by jersey name..." 
+                           placeholder="Search by player name..." 
                            value="<?php echo htmlspecialchars($search_query); ?>" required>
                     <button type="submit" name="search" class="btn search-btn">Search</button>
                     <?php if (!empty($search_query)): ?>
@@ -248,67 +316,56 @@ $conn->close();
             </form>
         </div>
         
-        <?php if (isset($_POST['search'])): ?>
+        <?php if ($search_performed): ?>
             <div class="results-container">
                 <?php if (!empty($search_query)): ?>
                     <h3 class="results-title">Search Results for "<?php echo htmlspecialchars($search_query); ?>"</h3>
                 <?php endif; ?>
                 
-                <?php if (count($orders) > 0): ?>
+                <?php if (count($products) > 0): ?>
                     <div class="search-stats">
-                        Found <?php echo count($orders); ?> result(s) | Total Amount: ₱<?php echo number_format($total_cost, 2); ?>
+                        Found <?php echo count($products); ?> jersey(s) matching your search
                     </div>
                     
-                    <div class="table-responsive">
-                        <table class="table table-striped mb-0">
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>Jersey Name</th>
-                                    <th>Price</th>
-                                    <th>Order Date</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($orders as $index => $order): ?>
-                                    <tr>
-                                        <td><?php echo $index + 1; ?></td>
-                                        <td>
-                                            <strong><?php echo htmlspecialchars($order['item']); ?></strong>
-                                        </td>
-                                        <td>
-                                            <span class="text-danger fw-bold">₱<?php echo number_format($order['cost'], 2); ?></span>
-                                        </td>
-                                        <td><?php echo date('M d, Y - g:i A', strtotime($order['order_date'])); ?></td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
+                    <div class="row">
+                        <?php foreach ($products as $product): ?>
+                            <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12">
+                                <div class="jersey-item">
+                                    <div class="jersey-image-container">
+                                        <img src="<?php echo htmlspecialchars($product['image']); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>" class="jersey-image">
+                                    </div>
+                                    <div class="jersey-name"><?php echo htmlspecialchars($product['name']); ?></div>
+                                    <div class="jersey-price">₱<?php echo number_format($product['price']); ?></div>
+                                    <a href="ordering.php?item=<?php echo urlencode($product['name']); ?>&cost=<?php echo $product['price']; ?>" class="add-to-cart">Add to Cart</a>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
                     </div>
                     
-                    <div class="total-section">
-                        <h4>Search Summary</h4>
-                        <p class="mb-0">Total Results: <?php echo count($orders); ?></p>
-                        <h3 class="mb-0">Total Amount: ₱<?php echo number_format($total_cost, 2); ?></h3>
+                    <div class="browse-all">
+                        <a href="ordering.php" class="btn btn-primary btn-lg">Browse All Jerseys</a>
                     </div>
                     
                 <?php else: ?>
                     <div class="no-results">
                         <div style="font-size: 60px; color: #ccc; margin-bottom: 20px;">🔍</div>
                         <h4>No Results Found</h4>
-                        <p>No orders found matching "<?php echo htmlspecialchars($search_query); ?>". Try searching with different keywords.</p>
+                        <p>No jerseys found matching "<?php echo htmlspecialchars($search_query); ?>". Try searching with different keywords.</p>
                         <a href="search_orders.php" class="btn btn-secondary me-2">Try Again</a>
-                        <a href="view_orders.php" class="btn btn-primary">View All Orders</a>
+                        <a href="ordering.php" class="btn btn-primary">Browse All Jerseys</a>
                     </div>
                 <?php endif; ?>
             </div>
         <?php else: ?>
             <div class="results-container">
                 <div class="no-results">
-                    <div style="font-size: 60px; color: #ccc; margin-bottom: 20px;">🔍</div>
-                    <h4>Search Your Orders</h4>
-                    <p>Enter a jersey name or keyword above to search through your orders.</p>
-                    <a href="view_orders.php" class="btn btn-primary">View All Orders</a>
+                    <div style="font-size: 60px; color: #ccc; margin-bottom: 20px;">🏀</div>
+                    <h4>Search NBA Jerseys</h4>
+                    <p>Enter a player name above to search through our complete collection of NBA jerseys.</p>
+                    <div style="margin: 20px 0; color: #666; font-size: 14px;">
+                        <strong>Popular searches:</strong> LeBron, Curry, Giannis, Jokic, Wembanyama
+                    </div>
+                    <a href="ordering.php" class="btn btn-primary">Browse All Jerseys</a>
                 </div>
             </div>
         <?php endif; ?>
