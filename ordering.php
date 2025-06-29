@@ -1,15 +1,12 @@
 <?php
 session_start();
 
-
 if (!isset($_SESSION['user_email'])) {
     header("Location: login.php");
     exit();
 }
 
-
 require_once 'db_connect.php';
-
 
 if (isset($_GET['item']) && isset($_GET['cost'])) {
     $item_name = $_GET['item'];
@@ -19,7 +16,6 @@ if (isset($_GET['item']) && isset($_GET['cost'])) {
     $amount = $cost * $quantity;
     $order_date = date('Y-m-d'); 
     
-
     $stmt = $conn->prepare("INSERT INTO orders (order_date, email, item, cost, quantity, amount) VALUES (?, ?, ?, ?, ?, ?)");
     $stmt->bind_param("ssiiid", $order_date, $user_email, $cost, $cost, $quantity, $amount);
     
@@ -197,7 +193,6 @@ $conn->close();
 </head>
 <body>
     <div class="container-fluid">
-     
         <nav class="navbar navbar-expand-lg navbar-custom">
             <div class="container">
                 <a class="navbar-brand" href="ordering.php">NBA JERSEY STORE</a>
@@ -223,7 +218,6 @@ $conn->close();
             </div>
         </nav>
         
-     
         <div class="user-info">
             <strong>Welcome, <?php echo htmlspecialchars($_SESSION['user_email']); ?>!</strong>
             <span class="float-end">
@@ -231,7 +225,6 @@ $conn->close();
             </span>
         </div>
         
-       
         <?php if (isset($success_message)): ?>
             <div class="success-message"><?php echo htmlspecialchars($success_message); ?></div>
         <?php endif; ?>
@@ -243,7 +236,6 @@ $conn->close();
         <div class="jersey-table">
             <h1 class="text-center mb-4">NBA JERSEY COLLECTION</h1>
             
-        
             <div class="row">
                 <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12">
                     <div class="jersey-item">
@@ -300,7 +292,6 @@ $conn->close();
                     </div>
                 </div>
             </div>
-            
             
             <div class="row">
                 <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12">
@@ -359,7 +350,6 @@ $conn->close();
                 </div>
             </div>
             
-        
             <div class="row">
                 <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12">
                     <div class="jersey-item">
@@ -380,6 +370,153 @@ $conn->close();
                         <div class="jersey-name">Dirk Nowitzki</div>
                         <div class="jersey-price">₱1200</div>
                         <a href="ordering.php?item=Dirk Nowitzki&cost=1200" class="add-to-cart">Add to Cart</a>
+                    </div>
+                </div>
+                
+                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12">
+                    <div class="jersey-item">
+                        <div class="jersey-image-container">
+                            <img src="images/Jokic.jpg" alt="Nikola Jokic" class="jersey-image">
+                        </div>
+                        <div class="jersey-name">Nikola Jokic</div>
+                        <div class="jersey-price">₱1300</div>
+                        <a href="ordering.php?item=Nikola Jokic&cost=1300" class="add-to-cart">Add to Cart</a>
+                    </div>
+                </div>
+                
+                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12">
+                    <div class="jersey-item">
+                        <div class="jersey-image-container">
+                            <img src="images/Curry.jpg" alt="Stephen Curry" class="jersey-image">
+                        </div>
+                        <div class="jersey-name">Stephen Curry</div>
+                        <div class="jersey-price">₱1400</div>
+                        <a href="ordering.php?item=Stephen Curry&cost=1400" class="add-to-cart">Add to Cart</a>
+                    </div>
+                </div>
+                
+                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12">
+                    <div class="jersey-item">
+                        <div class="jersey-image-container">
+                            <img src="images/Harden.jpg" alt="James Harden" class="jersey-image">
+                        </div>
+                        <div class="jersey-name">James Harden</div>
+                        <div class="jersey-price">₱1500</div>
+                        <a href="ordering.php?item=James Harden&cost=1500" class="add-to-cart">Add to Cart</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12">
+                    <div class="jersey-item">
+                        <div class="jersey-image-container">
+                            <img src="images/Oladipo.jpg" alt="Victor Oladipo" class="jersey-image">
+                        </div>
+                        <div class="jersey-name">Victor Oladipo</div>
+                        <div class="jersey-price">₱1600</div>
+                        <a href="ordering.php?item=Victor Oladipo&cost=1600" class="add-to-cart">Add to Cart</a>
+                    </div>
+                </div>
+                
+                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12">
+                    <div class="jersey-item">
+                        <div class="jersey-image-container">
+                            <img src="images/Lebron.jpg" alt="Lebron James" class="jersey-image">
+                        </div>
+                        <div class="jersey-name">Lebron James</div>
+                        <div class="jersey-price">₱1700</div>
+                        <a href="ordering.php?item=Lebron James&cost=1700" class="add-to-cart">Add to Cart</a>
+                    </div>
+                </div>
+                
+                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12">
+                    <div class="jersey-item">
+                        <div class="jersey-image-container">
+                            <img src="images/Conley.jpg" alt="Mike Conley" class="jersey-image">
+                        </div>
+                        <div class="jersey-name">Mike Conley</div>
+                        <div class="jersey-price">₱1800</div>
+                        <a href="ordering.php?item=Mike Conley&cost=1800" class="add-to-cart">Add to Cart</a>
+                    </div>
+                </div>
+                
+                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12">
+                    <div class="jersey-item">
+                        <div class="jersey-image-container">
+                            <img src="images/Wade.jpg" alt="Dwayne Wade" class="jersey-image">
+                        </div>
+                        <div class="jersey-name">Dwayne Wade</div>
+                        <div class="jersey-price">₱1900</div>
+                        <a href="ordering.php?item=Dwayne Wade&cost=1900" class="add-to-cart">Add to Cart</a>
+                    </div>
+                </div>
+                
+                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12">
+                    <div class="jersey-item">
+                        <div class="jersey-image-container">
+                            <img src="images/Giannis.jpg" alt="Giannis Antetokounmpo" class="jersey-image">
+                        </div>
+                        <div class="jersey-name">Giannis Antetokounmpo</div>
+                        <div class="jersey-price">₱2000</div>
+                        <a href="ordering.php?item=Giannis Antetokounmpo&cost=2000" class="add-to-cart">Add to Cart</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12">
+                    <div class="jersey-item">
+                        <div class="jersey-image-container">
+                            <img src="images/Westbrook.jpg" alt="Russell Westbrook" class="jersey-image">
+                        </div>
+                        <div class="jersey-name">Russell Westbrook</div>
+                        <div class="jersey-price">₱2100</div>
+                        <a href="ordering.php?item=Russell Westbrook&cost=2100" class="add-to-cart">Add to Cart</a>
+                    </div>
+                </div>
+                
+                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12">
+                    <div class="jersey-item">
+                        <div class="jersey-image-container">
+                            <img src="images/Suns.jpg" alt="Devin Booker" class="jersey-image">
+                        </div>
+                        <div class="jersey-name">Devin Booker</div>
+                        <div class="jersey-price">₱2200</div>
+                        <a href="ordering.php?item=Devin Booker&cost=2200" class="add-to-cart">Add to Cart</a>
+                    </div>
+                </div>
+                
+                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12">
+                    <div class="jersey-item">
+                        <div class="jersey-image-container">
+                            <img src="images/Fox.jpg" alt="De'Aaron Fox" class="jersey-image">
+                        </div>
+                        <div class="jersey-name">De'Aaron Fox</div>
+                        <div class="jersey-price">₱2300</div>
+                        <a href="ordering.php?item=De'Aaron Fox&cost=2300" class="add-to-cart">Add to Cart</a>
+                    </div>
+                </div>
+                
+                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12">
+                    <div class="jersey-item">
+                        <div class="jersey-image-container">
+                            <img src="images/Utah.jpg" alt="Jordan Clarkson" class="jersey-image">
+                        </div>
+                        <div class="jersey-name">Jordan Clarkson</div>
+                        <div class="jersey-price">₱2400</div>
+                        <a href="ordering.php?item=Jordan Clarkson&cost=2400" class="add-to-cart">Add to Cart</a>
+                    </div>
+                </div>
+                
+                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12">
+                    <div class="jersey-item">
+                        <div class="jersey-image-container">
+                            <img src="images/Spurs.jpg" alt="Manu Ginobili" class="jersey-image">
+                        </div>
+                        <div class="jersey-name">Manu Ginobili</div>
+                        <div class="jersey-price">₱2500</div>
+                        <a href="ordering.php?item=Manu Ginobili&cost=2500" class="add-to-cart">Add to Cart</a>
                     </div>
                 </div>
             </div>
