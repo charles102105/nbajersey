@@ -1,35 +1,3 @@
-<?php
-session_start();
-
-if (!isset($_SESSION['user_email'])) {
-    header("Location: login.php");
-    exit();
-}
-
-require_once 'db_connect.php';
-
-if (isset($_GET['item']) && isset($_GET['cost'])) {
-    $item_name = $_GET['item'];
-    $cost = intval($_GET['cost']);
-    $user_email = $_SESSION['user_email'];
-    $quantity = 1; 
-    $amount = $cost * $quantity;
-    $order_date = date('Y-m-d'); 
-    
-    $stmt = $conn->prepare("INSERT INTO orders (order_date, email, item, cost, quantity, amount) VALUES (?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("sssiid", $order_date, $user_email, $item_name, $cost, $quantity, $amount);
-    
-    if ($stmt->execute()) {
-        $success_message = "Item added to your orders successfully!";
-    } else {
-        $error_message = "Error adding item to orders.";
-    }
-    $stmt->close();
-}
-
-$conn->close();
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -66,6 +34,66 @@ $conn->close();
             color: #f0f0f0 !important;
         }
         
+        .search-container {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        .search-title {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+        
+        .search-form {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .search-input {
+            border-radius: 25px;
+            padding: 12px 20px;
+            border: 2px solid #dee2e6;
+            font-size: 16px;
+        }
+        
+        .search-input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        
+        .search-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 25px;
+            padding: 12px 30px;
+            color: white;
+            font-weight: 500;
+        }
+        
+        .search-btn:hover {
+            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+            color: white;
+        }
+        
+        .clear-search {
+            background-color: #6c757d;
+            border: none;
+            border-radius: 25px;
+            padding: 8px 20px;
+            color: white;
+            font-size: 14px;
+            margin-left: 10px;
+        }
+        
+        .clear-search:hover {
+            background-color: #5a6268;
+            color: white;
+        }
+        
         .jersey-table {
             background: white;
             border-radius: 10px;
@@ -75,7 +103,7 @@ $conn->close();
         
         .jersey-item {
             text-align: center;
-            padding: 15px;
+            padding: 25px;
             border: 1px solid #dee2e6;
             margin-bottom: 20px;
             border-radius: 8px;
@@ -93,13 +121,13 @@ $conn->close();
         
         .jersey-image-container {
             width: 100%;
-            height: 300px;
+            height: 350px;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
             border-radius: 5px;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             background-color: #f8f9fa;
         }
         
@@ -113,9 +141,9 @@ $conn->close();
         }
         
         .jersey-name {
-            font-size: 16px;
+            font-size: 18px;
             font-weight: bold;
-            margin: 10px 0;
+            margin: 15px 0;
             color: #333;
             flex-grow: 1;
             display: flex;
@@ -124,20 +152,20 @@ $conn->close();
         }
         
         .jersey-price {
-            font-size: 18px;
+            font-size: 20px;
             color: #dc3545;
             font-weight: bold;
-            margin: 10px 0;
+            margin: 15px 0;
         }
         
         .add-to-cart {
             background-color: #007bff;
             color: white;
-            padding: 8px 16px;
+            padding: 12px 20px;
             text-decoration: none;
             border-radius: 4px;
             display: inline-block;
-            font-size: 14px;
+            font-size: 16px;
             margin-top: auto;
             transition: background-color 0.3s ease;
         }
@@ -174,19 +202,41 @@ $conn->close();
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
         
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        @media (max-width: 1200px) {
+            .grid-container {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        
+        @media (max-width: 992px) {
+            .grid-container {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        
         @media (max-width: 768px) {
+            .grid-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
             .jersey-image-container {
-                height: 250px;
+                height: 150px;
             }
         }
         
         @media (max-width: 576px) {
+            .grid-container {
+                grid-template-columns: 1fr;
+            }
             .jersey-image-container {
                 height: 200px;
-            }
-            
-            .jersey-item {
-                padding: 10px;
             }
         }
     </style>
@@ -195,23 +245,20 @@ $conn->close();
     <div class="container-fluid">
         <nav class="navbar navbar-expand-lg navbar-custom">
             <div class="container">
-                <a class="navbar-brand" href="ordering.php">NBA JERSEY STORE</a>
+                <a class="navbar-brand" href="#">NBA JERSEY STORE</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav ms-auto">
                         <li class="nav-item">
-                            <a class="nav-link" href="ordering.php">Shop</a>
+                            <a class="nav-link active" href="#">Shop</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="view_orders.php">My Orders</a>
+                            <a class="nav-link" href="#">My Orders</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="search_orders.php">Search Items</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="logout.php">Logout</a>
+                            <a class="nav-link" href="#">Logout</a>
                         </li>
                     </ul>
                 </div>
@@ -219,308 +266,259 @@ $conn->close();
         </nav>
         
         <div class="user-info">
-            <strong>Welcome, <?php echo htmlspecialchars($_SESSION['user_email']); ?>!</strong>
+            <strong>Welcome, user@example.com!</strong>
             <span class="float-end">
-                <a href="view_orders.php" class="btn btn-sm btn-outline-primary">View My Orders</a>
+                <a href="#" class="btn btn-sm btn-outline-primary">View My Orders</a>
             </span>
         </div>
         
-        <?php if (isset($success_message)): ?>
-            <div class="success-message"><?php echo htmlspecialchars($success_message); ?></div>
-        <?php endif; ?>
-        
-        <?php if (isset($error_message)): ?>
-            <div class="error-message"><?php echo htmlspecialchars($error_message); ?></div>
-        <?php endif; ?>
+        <div class="search-container">
+            <h2 class="search-title">Search NBA Jerseys</h2>
+            
+            <form class="search-form">
+                <div class="input-group">
+                    <input type="text" class="form-control search-input" placeholder="Search by player name...">
+                    <button type="submit" class="btn search-btn">Search</button>
+                </div>
+            </form>
+            
+            <div style="text-align: center; margin-top: 20px; color: #666; font-size: 14px;">
+                <strong>Popular searches:</strong> LeBron, Curry, Giannis, Jokic, Wembanyama
+            </div>
+        </div>
         
         <div class="jersey-table">
             <h1 class="text-center mb-4">NBA JERSEY COLLECTION</h1>
             
-            <div class="row">
-                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12">
-                    <div class="jersey-item">
-                        <div class="jersey-image-container">
-                            <img src="images/kawhileonard.jpg" alt="Kawhi Leonard" class="jersey-image">
-                        </div>
-                        <div class="jersey-name">Kawhi Leonard</div>
-                        <div class="jersey-price">₱100</div>
-                        <a href="ordering.php?item=Kawhi Leonard&cost=100" class="add-to-cart">Add to Cart</a>
+            <div class="grid-container">
+                <div class="jersey-item">
+                    <div class="jersey-image-container">
+                        <img src="images/kawhileonard.jpg" alt="Kawhi Leonard" class="jersey-image">
                     </div>
+                    <div class="jersey-name">Kawhi Leonard</div>
+                    <div class="jersey-price">₱100</div>
+                    <a href="#" class="add-to-cart">Add to Cart</a>
                 </div>
                 
-                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12">
-                    <div class="jersey-item">
-                        <div class="jersey-image-container">
-                            <img src="images/brunson.jpg" alt="Jalen Brunson" class="jersey-image">
-                        </div>
-                        <div class="jersey-name">Jalen Brunson</div>
-                        <div class="jersey-price">₱200</div>
-                        <a href="ordering.php?item=Jalen Brunson&cost=200" class="add-to-cart">Add to Cart</a>
+                <div class="jersey-item">
+                    <div class="jersey-image-container">
+                        <img src="images/brunson.jpg" alt="Jalen Brunson" class="jersey-image">
                     </div>
+                    <div class="jersey-name">Jalen Brunson</div>
+                    <div class="jersey-price">₱200</div>
+                    <a href="#" class="add-to-cart">Add to Cart</a>
                 </div>
                 
-                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12">
-                    <div class="jersey-item">
-                        <div class="jersey-image-container">
-                            <img src="images/jimmybutler.jpg" alt="Jimmy Butler" class="jersey-image">
-                        </div>
-                        <div class="jersey-name">Jimmy Butler</div>
-                        <div class="jersey-price">₱300</div>
-                        <a href="ordering.php?item=Jimmy Butler&cost=300" class="add-to-cart">Add to Cart</a>
+                <div class="jersey-item">
+                    <div class="jersey-image-container">
+                        <img src="images/jimmybutler.jpg" alt="Jimmy Butler" class="jersey-image">
                     </div>
+                    <div class="jersey-name">Jimmy Butler</div>
+                    <div class="jersey-price">₱300</div>
+                    <a href="#" class="add-to-cart">Add to Cart</a>
                 </div>
                 
-                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12">
-                    <div class="jersey-item">
-                        <div class="jersey-image-container">
-                            <img src="images/Wolves.jpg" alt="Karl Anthony Towns" class="jersey-image">
-                        </div>
-                        <div class="jersey-name">KAT WOLVES SERIES</div>
-                        <div class="jersey-price">₱400</div>
-                        <a href="ordering.php?item=KAT WOLVES SERIES&cost=400" class="add-to-cart">Add to Cart</a>
+                <div class="jersey-item">
+                    <div class="jersey-image-container">
+                        <img src="images/Wolves.jpg" alt="KAT WOLVES SERIES" class="jersey-image">
                     </div>
+                    <div class="jersey-name">KAT WOLVES SERIES</div>
+                    <div class="jersey-price">₱400</div>
+                    <a href="#" class="add-to-cart">Add to Cart</a>
                 </div>
                 
-                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12">
-                    <div class="jersey-item">
-                        <div class="jersey-image-container">
-                            <img src="images/Ball.jpeg" alt="Lamelo Ball" class="jersey-image">
-                        </div>
-                        <div class="jersey-name">Lamelo Ball</div>
-                        <div class="jersey-price">₱500</div>
-                        <a href="ordering.php?item=Lamelo Ball&cost=500" class="add-to-cart">Add to Cart</a>
+                <div class="jersey-item">
+                    <div class="jersey-image-container">
+                        <img src="images/Ball.jpeg" alt="Lamelo Ball" class="jersey-image">
                     </div>
-                </div>
-            </div>
-            
-            <div class="row">
-                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12">
-                    <div class="jersey-item">
-                        <div class="jersey-image-container">
-                            <img src="images/wembanyama.jpeg" alt="Victor Wembanyama" class="jersey-image">
-                        </div>
-                        <div class="jersey-name">Victor Wembanyama</div>
-                        <div class="jersey-price">₱600</div>
-                        <a href="ordering.php?item=Victor Wembanyama&cost=600" class="add-to-cart">Add to Cart</a>
-                    </div>
+                    <div class="jersey-name">Lamelo Ball</div>
+                    <div class="jersey-price">₱500</div>
+                    <a href="#" class="add-to-cart">Add to Cart</a>
                 </div>
                 
-                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12">
-                    <div class="jersey-item">
-                        <div class="jersey-image-container">
-                            <img src="images/irving.jpg" alt="Kyrie Irving" class="jersey-image">
-                        </div>
-                        <div class="jersey-name">Kyrie Irving</div>
-                        <div class="jersey-price">₱700</div>
-                        <a href="ordering.php?item=Kyrie Irving&cost=700" class="add-to-cart">Add to Cart</a>
+                <div class="jersey-item">
+                    <div class="jersey-image-container">
+                        <img src="images/wembanyama.jpeg" alt="Victor Wembanyama" class="jersey-image">
                     </div>
+                    <div class="jersey-name">Victor Wembanyama</div>
+                    <div class="jersey-price">₱600</div>
+                    <a href="#" class="add-to-cart">Add to Cart</a>
                 </div>
                 
-                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12">
-                    <div class="jersey-item">
-                        <div class="jersey-image-container">
-                            <img src="images/russell.jpg" alt="D Angelo Russell" class="jersey-image">
-                        </div>
-                        <div class="jersey-name">D Angelo Russell</div>
-                        <div class="jersey-price">₱800</div>
-                        <a href="ordering.php?item=D Angelo Russell&cost=800" class="add-to-cart">Add to Cart</a>
+                <div class="jersey-item">
+                    <div class="jersey-image-container">
+                        <img src="images/irving.jpg" alt="Kyrie Irving" class="jersey-image">
                     </div>
+                    <div class="jersey-name">Kyrie Irving</div>
+                    <div class="jersey-price">₱700</div>
+                    <a href="#" class="add-to-cart">Add to Cart</a>
                 </div>
                 
-                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12">
-                    <div class="jersey-item">
-                        <div class="jersey-image-container">
-                            <img src="images/Kemba.jpg" alt="Kemba Walker" class="jersey-image">
-                        </div>
-                        <div class="jersey-name">Kemba Walker</div>
-                        <div class="jersey-price">₱900</div>
-                        <a href="ordering.php?item=Kemba Walker&cost=900" class="add-to-cart">Add to Cart</a>
+                <div class="jersey-item">
+                    <div class="jersey-image-container">
+                        <img src="images/russell.jpg" alt="D Angelo Russell" class="jersey-image">
                     </div>
+                    <div class="jersey-name">D Angelo Russell</div>
+                    <div class="jersey-price">₱800</div>
+                    <a href="#" class="add-to-cart">Add to Cart</a>
                 </div>
                 
-                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12">
-                    <div class="jersey-item">
-                        <div class="jersey-image-container">
-                            <img src="images/Markannen.jpg" alt="Lauri Markannen" class="jersey-image">
-                        </div>
-                        <div class="jersey-name">Lauri Markannen</div>
-                        <div class="jersey-price">₱1000</div>
-                        <a href="ordering.php?item=Lauri Markannen&cost=1000" class="add-to-cart">Add to Cart</a>
+                <div class="jersey-item">
+                    <div class="jersey-image-container">
+                        <img src="images/Kemba.jpg" alt="Kemba Walker" class="jersey-image">
                     </div>
-                </div>
-            </div>
-            
-            <div class="row">
-                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12">
-                    <div class="jersey-item">
-                        <div class="jersey-image-container">
-                            <img src="images/Love.jpg" alt="Kevin Love" class="jersey-image">
-                        </div>
-                        <div class="jersey-name">Kevin Love</div>
-                        <div class="jersey-price">₱1100</div>
-                        <a href="ordering.php?item=Kevin Love&cost=1100" class="add-to-cart">Add to Cart</a>
-                    </div>
+                    <div class="jersey-name">Kemba Walker</div>
+                    <div class="jersey-price">₱900</div>
+                    <a href="#" class="add-to-cart">Add to Cart</a>
                 </div>
                 
-                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12">
-                    <div class="jersey-item">
-                        <div class="jersey-image-container">
-                            <img src="images/Nowitski.jpg" alt="Dirk Nowitzki" class="jersey-image">
-                        </div>
-                        <div class="jersey-name">Dirk Nowitzki</div>
-                        <div class="jersey-price">₱1200</div>
-                        <a href="ordering.php?item=Dirk Nowitzki&cost=1200" class="add-to-cart">Add to Cart</a>
+                <div class="jersey-item">
+                    <div class="jersey-image-container">
+                        <img src="images/Markannen.jpg" alt="Lauri Markannen" class="jersey-image">
                     </div>
+                    <div class="jersey-name">Lauri Markannen</div>
+                    <div class="jersey-price">₱1,000</div>
+                    <a href="#" class="add-to-cart">Add to Cart</a>
                 </div>
                 
-                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12">
-                    <div class="jersey-item">
-                        <div class="jersey-image-container">
-                            <img src="images/Jokic.jpg" alt="Nikola Jokic" class="jersey-image">
-                        </div>
-                        <div class="jersey-name">Nikola Jokic</div>
-                        <div class="jersey-price">₱1300</div>
-                        <a href="ordering.php?item=Nikola Jokic&cost=1300" class="add-to-cart">Add to Cart</a>
+                <div class="jersey-item">
+                    <div class="jersey-image-container">
+                        <img src="images/Love.jpg" alt="Kevin Love" class="jersey-image">
                     </div>
+                    <div class="jersey-name">Kevin Love</div>
+                    <div class="jersey-price">₱1,100</div>
+                    <a href="#" class="add-to-cart">Add to Cart</a>
                 </div>
                 
-                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12">
-                    <div class="jersey-item">
-                        <div class="jersey-image-container">
-                            <img src="images/Curry.jpg" alt="Stephen Curry" class="jersey-image">
-                        </div>
-                        <div class="jersey-name">Stephen Curry</div>
-                        <div class="jersey-price">₱1400</div>
-                        <a href="ordering.php?item=Stephen Curry&cost=1400" class="add-to-cart">Add to Cart</a>
+                <div class="jersey-item">
+                    <div class="jersey-image-container">
+                        <img src="images/Nowitski.jpg" alt="Dirk Nowitzki" class="jersey-image">
                     </div>
+                    <div class="jersey-name">Dirk Nowitzki</div>
+                    <div class="jersey-price">₱1,200</div>
+                    <a href="#" class="add-to-cart">Add to Cart</a>
                 </div>
                 
-                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12">
-                    <div class="jersey-item">
-                        <div class="jersey-image-container">
-                            <img src="images/Harden.jpg" alt="James Harden" class="jersey-image">
-                        </div>
-                        <div class="jersey-name">James Harden</div>
-                        <div class="jersey-price">₱1500</div>
-                        <a href="ordering.php?item=James Harden&cost=1500" class="add-to-cart">Add to Cart</a>
+                <div class="jersey-item">
+                    <div class="jersey-image-container">
+                        <img src="images/Jokic.jpg" alt="Nikola Jokic" class="jersey-image">
                     </div>
-                </div>
-            </div>
-            
-            <div class="row">
-                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12">
-                    <div class="jersey-item">
-                        <div class="jersey-image-container">
-                            <img src="images/Oladipo.jpg" alt="Victor Oladipo" class="jersey-image">
-                        </div>
-                        <div class="jersey-name">Victor Oladipo</div>
-                        <div class="jersey-price">₱1600</div>
-                        <a href="ordering.php?item=Victor Oladipo&cost=1600" class="add-to-cart">Add to Cart</a>
-                    </div>
+                    <div class="jersey-name">Nikola Jokic</div>
+                    <div class="jersey-price">₱1,300</div>
+                    <a href="#" class="add-to-cart">Add to Cart</a>
                 </div>
                 
-                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12">
-                    <div class="jersey-item">
-                        <div class="jersey-image-container">
-                            <img src="images/Lebron.jpg" alt="Lebron James" class="jersey-image">
-                        </div>
-                        <div class="jersey-name">Lebron James</div>
-                        <div class="jersey-price">₱1700</div>
-                        <a href="ordering.php?item=Lebron James&cost=1700" class="add-to-cart">Add to Cart</a>
+                <div class="jersey-item">
+                    <div class="jersey-image-container">
+                        <img src="images/Curry.jpg" alt="Stephen Curry" class="jersey-image">
                     </div>
+                    <div class="jersey-name">Stephen Curry</div>
+                    <div class="jersey-price">₱1,400</div>
+                    <a href="#" class="add-to-cart">Add to Cart</a>
                 </div>
                 
-                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12">
-                    <div class="jersey-item">
-                        <div class="jersey-image-container">
-                            <img src="images/Conley.jpg" alt="Mike Conley" class="jersey-image">
-                        </div>
-                        <div class="jersey-name">Mike Conley</div>
-                        <div class="jersey-price">₱1800</div>
-                        <a href="ordering.php?item=Mike Conley&cost=1800" class="add-to-cart">Add to Cart</a>
+                <div class="jersey-item">
+                    <div class="jersey-image-container">
+                        <img src="images/Harden.jpg" alt="James Harden" class="jersey-image">
                     </div>
+                    <div class="jersey-name">James Harden</div>
+                    <div class="jersey-price">₱1,500</div>
+                    <a href="#" class="add-to-cart">Add to Cart</a>
                 </div>
                 
-                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12">
-                    <div class="jersey-item">
-                        <div class="jersey-image-container">
-                            <img src="images/Wade.jpg" alt="Dwayne Wade" class="jersey-image">
-                        </div>
-                        <div class="jersey-name">Dwayne Wade</div>
-                        <div class="jersey-price">₱1900</div>
-                        <a href="ordering.php?item=Dwayne Wade&cost=1900" class="add-to-cart">Add to Cart</a>
+                <div class="jersey-item">
+                    <div class="jersey-image-container">
+                        <img src="images/Oladipo.jpg" alt="Victor Oladipo" class="jersey-image">
                     </div>
+                    <div class="jersey-name">Victor Oladipo</div>
+                    <div class="jersey-price">₱1,600</div>
+                    <a href="#" class="add-to-cart">Add to Cart</a>
                 </div>
                 
-                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12">
-                    <div class="jersey-item">
-                        <div class="jersey-image-container">
-                            <img src="images/Giannis.jpg" alt="Giannis Antetokounmpo" class="jersey-image">
-                        </div>
-                        <div class="jersey-name">Giannis Antetokounmpo</div>
-                        <div class="jersey-price">₱2000</div>
-                        <a href="ordering.php?item=Giannis Antetokounmpo&cost=2000" class="add-to-cart">Add to Cart</a>
+                <div class="jersey-item">
+                    <div class="jersey-image-container">
+                        <img src="images/Lebron.jpg" alt="Lebron James" class="jersey-image">
                     </div>
-                </div>
-            </div>
-            
-            <div class="row">
-                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12">
-                    <div class="jersey-item">
-                        <div class="jersey-image-container">
-                            <img src="images/Westbrook.jpg" alt="Russell Westbrook" class="jersey-image">
-                        </div>
-                        <div class="jersey-name">Russell Westbrook</div>
-                        <div class="jersey-price">₱2100</div>
-                        <a href="ordering.php?item=Russell Westbrook&cost=2100" class="add-to-cart">Add to Cart</a>
-                    </div>
+                    <div class="jersey-name">Lebron James</div>
+                    <div class="jersey-price">₱1,700</div>
+                    <a href="#" class="add-to-cart">Add to Cart</a>
                 </div>
                 
-                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12">
-                    <div class="jersey-item">
-                        <div class="jersey-image-container">
-                            <img src="images/Suns.jpg" alt="Devin Booker" class="jersey-image">
-                        </div>
-                        <div class="jersey-name">Devin Booker</div>
-                        <div class="jersey-price">₱2200</div>
-                        <a href="ordering.php?item=Devin Booker&cost=2200" class="add-to-cart">Add to Cart</a>
+                <div class="jersey-item">
+                    <div class="jersey-image-container">
+                        <img src="images/Conley.jpg" alt="Mike Conley" class="jersey-image">
                     </div>
+                    <div class="jersey-name">Mike Conley</div>
+                    <div class="jersey-price">₱1,800</div>
+                    <a href="#" class="add-to-cart">Add to Cart</a>
                 </div>
                 
-                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12">
-                    <div class="jersey-item">
-                        <div class="jersey-image-container">
-                            <img src="images/Fox.jpg" alt="De'Aaron Fox" class="jersey-image">
-                        </div>
-                        <div class="jersey-name">De'Aaron Fox</div>
-                        <div class="jersey-price">₱2300</div>
-                        <a href="ordering.php?item=De'Aaron Fox&cost=2300" class="add-to-cart">Add to Cart</a>
+                <div class="jersey-item">
+                    <div class="jersey-image-container">
+                        <img src="images/Wade.jpg" alt="Dwayne Wade" class="jersey-image">
                     </div>
+                    <div class="jersey-name">Dwayne Wade</div>
+                    <div class="jersey-price">₱1,900</div>
+                    <a href="#" class="add-to-cart">Add to Cart</a>
                 </div>
                 
-                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12">
-                    <div class="jersey-item">
-                        <div class="jersey-image-container">
-                            <img src="images/Utah.jpg" alt="Jordan Clarkson" class="jersey-image">
-                        </div>
-                        <div class="jersey-name">Jordan Clarkson</div>
-                        <div class="jersey-price">₱2400</div>
-                        <a href="ordering.php?item=Jordan Clarkson&cost=2400" class="add-to-cart">Add to Cart</a>
+                <div class="jersey-item">
+                    <div class="jersey-image-container">
+                        <img src="images/Giannis.jpg" alt="Giannis Antetokounmpo" class="jersey-image">
                     </div>
+                    <div class="jersey-name">Giannis Antetokounmpo</div>
+                    <div class="jersey-price">₱2,000</div>
+                    <a href="#" class="add-to-cart">Add to Cart</a>
                 </div>
                 
-                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12">
-                    <div class="jersey-item">
-                        <div class="jersey-image-container">
-                            <img src="images/Spurs.jpg" alt="Manu Ginobili" class="jersey-image">
-                        </div>
-                        <div class="jersey-name">Manu Ginobili</div>
-                        <div class="jersey-price">₱2500</div>
-                        <a href="ordering.php?item=Manu Ginobili&cost=2500" class="add-to-cart">Add to Cart</a>
+                <div class="jersey-item">
+                    <div class="jersey-image-container">
+                        <img src="images/Westbrook.jpg" alt="Russell Westbrook" class="jersey-image">
                     </div>
+                    <div class="jersey-name">Russell Westbrook</div>
+                    <div class="jersey-price">₱2,100</div>
+                    <a href="#" class="add-to-cart">Add to Cart</a>
+                </div>
+                
+                <div class="jersey-item">
+                    <div class="jersey-image-container">
+                        <img src="images/Suns.jpg" alt="Devin Booker" class="jersey-image">
+                    </div>
+                    <div class="jersey-name">Devin Booker</div>
+                    <div class="jersey-price">₱2,200</div>
+                    <a href="#" class="add-to-cart">Add to Cart</a>
+                </div>
+                
+                <div class="jersey-item">
+                    <div class="jersey-image-container">
+                        <img src="images/Fox.jpg" alt="De'Aaron Fox" class="jersey-image">
+                    </div>
+                    <div class="jersey-name">De'Aaron Fox</div>
+                    <div class="jersey-price">₱2,300</div>
+                    <a href="#" class="add-to-cart">Add to Cart</a>
+                </div>
+                
+                <div class="jersey-item">
+                    <div class="jersey-image-container">
+                        <img src="images/Utah.jpg" alt="Jordan Clarkson" class="jersey-image">
+                    </div>
+                    <div class="jersey-name">Jordan Clarkson</div>
+                    <div class="jersey-price">₱2,400</div>
+                    <a href="#" class="add-to-cart">Add to Cart</a>
+                </div>
+                
+                <div class="jersey-item">
+                    <div class="jersey-image-container">
+                        <img src="images/Spurs.jpg" alt="Manu Ginobili" class="jersey-image">
+                    </div>
+                    <div class="jersey-name">Manu Ginobili</div>
+                    <div class="jersey-price">₱2,500</div>
+                    <a href="#" class="add-to-cart">Add to Cart</a>
                 </div>
             </div>
         </div>
     </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

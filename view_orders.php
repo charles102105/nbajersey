@@ -237,9 +237,6 @@ function getJerseyImage($jersey_name) {
                             <a class="nav-link active" href="view_orders.php">My Orders</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="search_orders.php">Search Items</a>
-                        </li>
-                        <li class="nav-item">
                             <a class="nav-link" href="logout.php">Logout</a>
                         </li>
                     </ul>

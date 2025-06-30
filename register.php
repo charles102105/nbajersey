@@ -6,7 +6,6 @@ if (isset($_SESSION['user_email'])) {
     exit();
 }
 
-
 require_once 'db_connect.php';
 
 $error_message = "";
@@ -20,14 +19,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (!empty($email) && !empty($password) && !empty($confirm_password)) {
         if ($password === $confirm_password) {
             if (strlen($password) >= 6) {
-        
+                
                 $stmt = $conn->prepare("SELECT email FROM users WHERE email = ?");
                 $stmt->bind_param("s", $email);
                 $stmt->execute();
                 $result = $stmt->get_result();
                 
                 if ($result->num_rows == 0) {
-                  
+           
                     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
                     
                     $insert_stmt = $conn->prepare("INSERT INTO users (email, password) VALUES (?, ?)");
@@ -43,6 +42,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $error_message = "Email already exists!";
                 }
                 $stmt->close();
+                $conn->close();
             } else {
                 $error_message = "Password must be at least 6 characters long!";
             }
@@ -53,8 +53,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $error_message = "Please fill in all fields!";
     }
 }
-
-$conn->close();
 ?>
 
 <!DOCTYPE html>
