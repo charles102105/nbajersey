@@ -51,31 +51,7 @@ $conn->close();
 
 function getJerseyImage($jersey_name) {
     $jersey_images = array(
-        "Kawhi Leonard" => "images/kawhileonard.jpg",
-        "Jalen Brunson" => "images/brunson.jpg",
-        "Jimmy Butler" => "images/jimmybutler.jpg",
-        "KAT WOLVES SERIES" => "images/Wolves.jpg",
-        "Lamelo Ball" => "images/Ball.jpeg",
-        "Victor Wembanyama" => "images/wembanyama.jpeg",
-        "Kyrie Irving" => "images/irving.jpg",
-        "D Angelo Russell" => "images/russell.jpg",
-        "Kemba Walker" => "images/Kemba.jpg",
-        "Lauri Markannen" => "images/Markannen.jpg",
-        "Kevin Love" => "images/Love.jpg",
-        "Dirk Nowitzki" => "images/Nowitski.jpg",
-        "Nikola Jokic" => "images/Jokic.jpg",
-        "Stephen Curry" => "images/Curry.jpg",
-        "James Harden" => "images/Harden.jpg",
-        "Victor Oladipo" => "images/Oladipo.jpg",
-        "Lebron James" => "images/Lebron.jpg",
-        "Mike Conley" => "images/Conley.jpg",
-        "Dwayne Wade" => "images/Wade.jpg",
-        "Giannis Antetokounmpo" => "images/Giannis.jpg",
-        "Russell Westbrook" => "images/Westbrook.jpg",
-        "Devin Booker" => "images/Suns.jpg",
-        "De'Aaron Fox" => "images/Fox.jpg",
-        "Jordan Clarkson" => "images/Utah.jpg",
-        "Manu Ginobili" => "images/Spurs.jpg"
+        "Kawhi Leonard" => "images/kawhileonard.jpg","Jalen Brunson" => "images/brunson.jpg","Jimmy Butler" => "images/jimmybutler.jpg", "KAT WOLVES SERIES" => "images/Wolves.jpg", "Lamelo Ball" => "images/Ball.jpeg", "Victor Wembanyama" => "images/wembanyama.jpeg","Kyrie Irving" => "images/irving.jpg","D Angelo Russell" => "images/russell.jpg", "Kemba Walker" => "images/Kemba.jpg","Lauri Markannen" => "images/Markannen.jpg","Kevin Love" => "images/Love.jpg",  "Dirk Nowitzki" => "images/Nowitski.jpg","Nikola Jokic" => "images/Jokic.jpg","Stephen Curry" => "images/Curry.jpg","James Harden" => "images/Harden.jpg","Victor Oladipo" => "images/Oladipo.jpg","Lebron James" => "images/Lebron.jpg","Mike Conley" => "images/Conley.jpg","Dwayne Wade" => "images/Wade.jpg",  "Giannis Antetokounmpo" => "images/Giannis.jpg", "Russell Westbrook" => "images/Westbrook.jpg", "Devin Booker" => "images/Suns.jpg",  "De'Aaron Fox" => "images/Fox.jpg","Jordan Clarkson" => "images/Utah.jpg", "Manu Ginobili" => "images/Spurs.jpg"
     );
     
     return isset($jersey_images[$jersey_name]) ? $jersey_images[$jersey_name] : "images/default.jpg";
@@ -325,7 +301,7 @@ function getJerseyImage($jersey_name) {
                                     <td>
                                         <span class="text-danger fw-bold">₱<?php echo number_format($order['cost'], 2); ?></span>
                                     </td>
-                                    <td><?php echo date('M d, Y - g:i A', strtotime($order['order_date'])); ?></td>
+                                    <td><?php echo date('M d, Y - g:i A'); ?></td>
                                     <td>
                                         <form method="GET" action="view_orders.php" style="display: inline;">
                                             <input type="hidden" name="delete_id" value="<?php echo htmlspecialchars($order['item']); ?>">
